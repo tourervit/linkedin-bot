@@ -1,4 +1,4 @@
-const garbage = ['dr.', 'lord', 'mr.'];
+const garbage = ['dr.', 'lord', 'mr.', 'mc'];
 console.info('Start LI invite sender bot New');
 
 var LOADING_STATUS = 0;
