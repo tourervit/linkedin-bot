@@ -1,0 +1,22 @@
+{
+   "background": {
+      "persistent": true,
+      "scripts": [ "jq.js", "background.js" ]
+   },
+   "browser_action": {
+      "default_icon": "icon.png",
+      "default_popup": "popup.html",
+      "default_title": "LinkedIn Helper"
+   },
+   "content_scripts": [ {
+      "js": [ "jq.js", "sk.js", "common.js", "sn-invites.js", "li-invites.js", "chat.js",  "for-new.js" , "follow-up.js"],
+      "matches": [ "https://www.linkedin.com/*" ]
+   } ],
+   "description": "LinkedIn Helper",
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA24tNtLMZAED6zLHBoBJOFyFDohBSvr22ObThzpYu3a1p+EHuTDQae1nnhLPPVNKmH8GLKuiKpG3DSB0XfN8uaHwa6ShTDfPxt8Ka1Cg4jA+j3Xx241y2p8q3CNC6rx7/OCFoEr+3dN8T9aCtZKct5Cignp6yIzOdkChjwro7fzWoYasolwKkK9zZECFk/oaJwLKEPy6UtnIU6Hf72v9GOC7A3wFbXTHsvsQzVTqvHBvy64vvu435Lt70e4EaRFDo8XdmVVeNrAU1YN9kBYBpsJU2V+ouJG9FWNl4Jn2BNLlUb3nrckeSVxgURosc2Vk8V0vUzrndjqXRrlweKhXSQwIDAQAB",
+   "manifest_version": 2,
+   "name": "LinkedIn Helper",
+   "permissions": [ "activeTab", "tabs", "http://*/*", "https://*/*", "https://dev.ovation.java.magora.team/", "notifications" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "1.8"
+}
