@@ -110,8 +110,8 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
         const fullName = $(item)
           .find('.name.actor-name')
           .text();
-        const firstName = removeJunk(fullName, garbage);
-        statistics.push(`${firstName} - ${new Date()}`);
+
+        statistics.push(`${fullName} - ${new Date()}`);
 
         await delay(1000, 1000);
       } catch (e) {
@@ -179,13 +179,4 @@ function randomInteger(min, max) {
   var rand = min + Math.random() * (max + 1 - min);
   rand = Math.floor(rand);
   return rand;
-}
-
-function removeJunk(name, garbage) {
-  let fullName = name.toLowerCase();
-  garbage.forEach(junk => {
-    fullName = fullName.replace(junk, '').trim();
-  });
-  firstName = fullName.split(' ')[0];
-  return firstName.charAt(0).toUpperCase() + firstName.slice(1);
 }
