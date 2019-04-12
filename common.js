@@ -1,4 +1,5 @@
 function formatMessage(msg, profile) {
+  let firstName;
   let fullName = profile.name.toLowerCase();
   const garbage = [
     'mr.',
@@ -23,12 +24,14 @@ function formatMessage(msg, profile) {
   garbage.forEach(junk => {
     fullName = fullName.replace(junk, '').trim();
   });
-  fullName = fullName.replace(
-    /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/gi,
-    '',
-  );
+  fullName = fullName
+    .replace(
+      /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/gi,
+      '',
+    )
+    .trim();
 
-  firstName = fullName.split(' ')[0];
+  firstName = fullName.includes(' ') ? fullName.split(' ')[0] : fullName;
   firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
   msg = msg.replace('{name}', firstName);
   return msg;
