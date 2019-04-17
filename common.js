@@ -26,13 +26,24 @@ function formatMessage(msg, profile) {
   });
   fullName = fullName
     .replace(
-      /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/gi,
+      /[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/gi,
       '',
     )
     .trim();
 
+  // After removing garbage, take the first word which is obviously the first name
   firstName = fullName.includes(' ') ? fullName.split(' ')[0] : fullName;
-  firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+
+  // if it's a double name, like Jean-Baptiste, split it into array, capitalize each of othem and join together with '-'
+  if (firstName.includes('-')) {
+    const doubleName = firstName
+      .split('-')
+      .map(name => name.charAt(0).toUpperCase() + name.slice(1));
+    firstName = doubleName.join('-');
+    // if it's a regular name
+  } else {
+    firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+  }
   msg = msg.replace('{name}', firstName);
   return msg;
 }
