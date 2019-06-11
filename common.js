@@ -36,9 +36,7 @@ function formatMessage(msg, profile) {
 
   // if it's a double name, like Jean-Baptiste, split it into array, capitalize each of othem and join together with '-'
   if (firstName.includes('-')) {
-    const doubleName = firstName
-      .split('-')
-      .map(name => name.charAt(0).toUpperCase() + name.slice(1));
+    const doubleName = firstName.split('-').map(name => name.charAt(0).toUpperCase() + name.slice(1));
     firstName = doubleName.join('-');
     // if it's a regular name
   } else {
@@ -67,4 +65,8 @@ function removeJunk(name, garbage) {
   });
   firstName = fullName.split(' ')[0];
   return firstName.charAt(0).toUpperCase() + firstName.slice(1);
+}
+
+function getRandomDelay(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
 }
