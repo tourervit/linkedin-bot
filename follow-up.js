@@ -15,17 +15,40 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     let currentLastChat;
 
     function checkLastMessageInChat(chatList) {
+      const today = new Date();
+      const todayTime = today.getTime();
+      const todayYear = today.getFullYear();
+
+      // 60 * 60 * 24 * 1000ms
+      const oneDay = 86400000;
+
       return new Promise(resolve => {
         let chatsMap = [];
+
         $.each(chatList, (index, item) => {
           const $chat = $(item);
           const chatLastMessage = $chat.find('.msg-conversation-card__message-snippet-body').text();
+          const lastMessageDate = $chat.find('.msg-conversation-listitem__time-stamp').text();
+          const lastMessageTime = lastMessageDate.includes(':')
+            ? todayTime
+            : new Date(`${lastMessageDate} ${todayYear}`).getTime();
+
+          const dayDiff = Math.floor((todayTime - lastMessageTime) / oneDay);
+
           const { testString } = message;
-          if (
-            chatLastMessage.toLowerCase().indexOf('you:') > -1 &&
-            chatLastMessage.toLowerCase().indexOf(testString.toLowerCase()) > -1
-          ) {
-            chatsMap.push($chat);
+
+          if (testString) {
+            if (
+              chatLastMessage.toLowerCase().indexOf('you:') > -1 &&
+              dayDiff > 1 &&
+              chatLastMessage.toLowerCase().indexOf(testString.toLowerCase()) > -1
+            ) {
+              chatsMap.push($chat);
+            }
+          } else {
+            if (chatLastMessage.toLowerCase().indexOf('you:') > -1 && dayDiff > 1) {
+              chatsMap.push($chat);
+            }
           }
         });
         resolve(chatsMap);
@@ -39,12 +62,11 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         function write() {
           return new Promise(resolve => {
             const messageForSend = formatMessage(message.message, extractProfile(chatsForMessage[index]));
-            console.log(messageForSend);
             const $messageField = $('.msg-form__contenteditable p');
             const $btnSend = $('.msg-form__send-button');
             setTimeout(() => {
-              $('.msg-form__contenteditable p').sendkeys(messageForSend);
-            }, getRandomDelay(2000, 4000));
+              $messageField.sendkeys(messageForSend);
+            }, 2000);
             setTimeout(() => {
               $btnSend.click();
               numberOfMessages++;
@@ -52,8 +74,9 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
                 name: extractProfile(chatsForMessage[index]),
                 message: messageForSend,
               });
+
               $messageField.val('');
-            }, getRandomDelay(4000, 6000));
+            }, 4000);
             resolve();
           });
         }

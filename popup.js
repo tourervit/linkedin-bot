@@ -106,14 +106,12 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('followUpConfig').style = '';
   });
 
-  document.getElementById('showFollowForNewUpBtn').addEventListener('click', function() {
-    document.getElementById('buttons').style = 'display:none';
-    document.getElementById('followUpForNewConfig').style = '';
-  });
+  // document.getElementById('showFollowForNewUpBtn').addEventListener('click', function() {
+  //   document.getElementById('buttons').style = 'display:none';
+  //   document.getElementById('followUpForNewConfig').style = '';
+  // });
 
   document.getElementById('startChat').addEventListener('click', clickMessageHandler);
   document.getElementById('startFollowUp').addEventListener('click', clickMessageWithTextHandler);
-  document
-    .getElementById('startFollowUp-for-new')
-    .addEventListener('click', clickMessageForNewHandler);
+  document.getElementById('startFollowUp-for-new').addEventListener('click', clickMessageForNewHandler);
 });
