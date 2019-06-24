@@ -8,6 +8,10 @@ var OPEN_DIALOG_WAIT_TIME = 2500;
 var ACCEPTED_MARKER = 'first';
 var SELECTED_MARKER = 'second';
 
+const today = new Date();
+const todayInMs = today.setHours(0, 0, 0, 0);
+const todayYear = today.getFullYear();
+
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   if (message.code == 'sn.startFollowUp') {
     const sendMessages = [];
@@ -15,38 +19,33 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     let currentLastChat;
 
     function checkLastMessageInChat(chatList) {
-      const today = new Date();
-      const todayTime = today.getTime();
-      const todayYear = today.getFullYear();
-
-      // 60 * 60 * 24 * 1000ms
-      const oneDay = 86400000;
-
       return new Promise(resolve => {
         let chatsMap = [];
 
         $.each(chatList, (index, item) => {
           const $chat = $(item);
-          const chatLastMessage = $chat.find('.msg-conversation-card__message-snippet-body').text();
-          const lastMessageDate = $chat.find('.msg-conversation-listitem__time-stamp').text();
-          const lastMessageTime = lastMessageDate.includes(':')
-            ? todayTime
-            : new Date(`${lastMessageDate} ${todayYear}`).getTime();
+          const chatLastMessage = $chat
+            .find('.msg-conversation-card__message-snippet-body')
+            .text()
+            .toLowerCase();
+          const lastMessageTimeStamp = $chat.find('.msg-conversation-card__time-stamp').text();
+          const lastMessageDateInMs =
+            lastMessageTimeStamp.indexOf(':') > -1
+              ? todayInMs
+              : new Date(`${lastMessageTimeStamp} ${todayYear}`).getTime();
 
-          const dayDiff = Math.floor((todayTime - lastMessageTime) / oneDay);
+          const dayDiff = (todayInMs - lastMessageDateInMs) / 86400000;
 
           const { testString } = message;
+          const lastMessageFromMeAndWasSentDaysAgo =
+            (chatLastMessage.indexOf('you:') > -1 || chatLastMessage.charAt(0) === ':') && dayDiff >= 3;
 
           if (testString) {
-            if (
-              chatLastMessage.toLowerCase().indexOf('you:') > -1 &&
-              dayDiff > 1 &&
-              chatLastMessage.toLowerCase().indexOf(testString.toLowerCase()) > -1
-            ) {
+            if (lastMessageFromMeAndWasSentDaysAgo && chatLastMessage.indexOf(testString.toLowerCase()) > -1) {
               chatsMap.push($chat);
             }
           } else {
-            if (chatLastMessage.toLowerCase().indexOf('you:') > -1 && dayDiff > 1) {
+            if (lastMessageFromMeAndWasSentDaysAgo) {
               chatsMap.push($chat);
             }
           }
@@ -64,19 +63,27 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
             const messageForSend = formatMessage(message.message, extractProfile(chatsForMessage[index]));
             const $messageField = $('.msg-form__contenteditable p');
             const $btnSend = $('.msg-form__send-button');
-            setTimeout(() => {
-              $messageField.sendkeys(messageForSend);
-            }, 2000);
-            setTimeout(() => {
-              $btnSend.click();
-              numberOfMessages++;
-              sendMessages.push({
-                name: extractProfile(chatsForMessage[index]),
-                message: messageForSend,
-              });
+            if ($('.msg-s-message-list-content').find('li.msg-s-message-list__event').length === 1) {
+              console.log('There is no answer, so we are gonna send a follow-up message');
+              setTimeout(() => {
+                $messageField.sendkeys(messageForSend);
+              }, 2000);
+              setTimeout(() => {
+                if ($('.msg-form__contenteditable p').text().length < 350) {
+                  // console.log($messageField.text());
+                  $btnSend.click();
 
-              $messageField.val('');
-            }, 4000);
+                  numberOfMessages++;
+                  sendMessages.push({
+                    name: extractProfile(chatsForMessage[index]),
+                    message: messageForSend,
+                  });
+
+                  $messageField.text('');
+                  // console.log($messageField.text());
+                }
+              }, 4000);
+            }
             resolve();
           });
         }
@@ -86,12 +93,14 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
             chatsForMessage[index].find('a')[0].scrollIntoView();
             chatsForMessage[index].find('a')[0].click();
             chatsForMessage[index].addClass('done');
-            write().then(() => {
-              setTimeout(() => {
-                index++;
-                resolve();
-              }, 6000);
-            });
+            setTimeout(() => {
+              write().then(() => {
+                setTimeout(() => {
+                  index++;
+                  resolve();
+                }, 6000);
+              });
+            }, 5000);
           });
         }
 
@@ -129,8 +138,8 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     }
 
     function extractProfile(item) {
-      var person = {};
-      var $name = $('.msg-conversation-card__participant-names', item);
+      const person = {};
+      const $name = $('.msg-conversation-card__participant-names', item);
       person.name = $name.text();
       return person;
     }

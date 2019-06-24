@@ -3,9 +3,13 @@ function formatMessage(msg, profile) {
   let fullName = profile.name.toLowerCase();
   const garbage = [
     'mr.',
+    'mr ',
     'ms.',
+    'ms ',
     'mrs.',
+    'mrs ',
     'dr.',
+    'dr ',
     'lord',
     'esq.',
     'jr.',
