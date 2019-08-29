@@ -1,4 +1,4 @@
-console.log('Start chat bot with test string');
+console.log('Start chat bot with smart string');
 var REST_TIME = 500;
 var WRITING_TIME = 6000;
 var CLICK_TIME = 500;
@@ -41,7 +41,10 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
             (chatLastMessage.indexOf('you:') > -1 || chatLastMessage.charAt(0) === ':') && dayDiff >= 3;
 
           if (testString) {
-            if (lastMessageFromMeAndWasSentDaysAgo && chatLastMessage.indexOf(testString.toLowerCase()) > -1) {
+            if (
+              lastMessageFromMeAndWasSentDaysAgo &&
+              chatLastMessage.indexOf(testString.toLowerCase()) > -1
+            ) {
               chatsMap.push($chat);
             }
           } else {
@@ -64,14 +67,14 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
             const $messageField = $('.msg-form__contenteditable p');
             const $btnSend = $('.msg-form__send-button');
             if ($('.msg-s-message-list-content').find('li.msg-s-message-list__event').length === 1) {
-              console.log('There is no answer, so we are gonna send a follow-up message');
+              // console.log('There is no answer, so we are gonna send a follow-up message');
               setTimeout(() => {
                 $messageField.sendkeys(messageForSend);
               }, 2000);
               setTimeout(() => {
-                if ($('.msg-form__contenteditable p').text().length < 350) {
-                  // console.log($messageField.text());
-                  $btnSend.click();
+                if ($('.msg-form__contenteditable p').text().length === messageForSend.length) {
+                  // console.log('MESSAGE FROM TEXT FIELD', $messageField.text());
+                  // $btnSend.click();
 
                   numberOfMessages++;
                   sendMessages.push({
