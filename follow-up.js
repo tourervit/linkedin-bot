@@ -74,7 +74,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
               setTimeout(() => {
                 if ($('.msg-form__contenteditable p').text().length === messageForSend.length) {
                   // console.log('MESSAGE FROM TEXT FIELD', $messageField.text());
-                  // $btnSend.click();
+                  $btnSend.click();
 
                   numberOfMessages++;
                   sendMessages.push({
