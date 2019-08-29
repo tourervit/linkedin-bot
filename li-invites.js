@@ -55,9 +55,7 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
     }
 
     async function nextPage() {
-      let pagination = $(
-        '.artdeco-pagination__button.artdeco-pagination__button--next.artdeco-button',
-      );
+      let pagination = $('.artdeco-pagination__button.artdeco-pagination__button--next.artdeco-button');
 
       if (!pagination.length) {
         pagination = $('.results-paginator .next');
@@ -75,7 +73,9 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
     }
 
     async function sendMessage(item) {
-      $(item)[0].scrollIntoView({ behavior: 'smooth' });
+      item.scrollIntoView({ behavior: 'smooth' });
+      await delay(500, 500);
+      window.scrollBy({ top: -52, behavior: 'smooth' });
 
       const profile = extractProfile(item);
       const btn = $(item).find('.search-result__actions--primary');
@@ -90,20 +90,24 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
       }
 
       try {
-        await delay(15000, 3000);
-
+        await delay(3000, 5000);
         $(btn).click();
 
-        await handleClickAddNote();
+        // if LinkedIn asking for type in user's email - return
+        await delay(1000, 2000);
+        if (document.querySelector('input#email')) {
+          $('.send-invite__cancel-btn').click();
+          return;
+        }
 
+        await handleClickAddNote();
         const textField = $('.send-invite__custom-message');
 
         await fillField(textField, message.inviteMessage, profile);
-
         const sendBtn = $('.send-invite__actions').find('.artdeco-button--3.ml1');
+        // const sendBtn = $('.send-invite__cancel-btn');
 
-        await delay(20000, 5000);
-
+        await delay(3000, 6000);
         $(sendBtn).click();
 
         count += 1;
@@ -111,7 +115,7 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
           .find('.name.actor-name')
           .text();
 
-        statistics.push(`${fullName} - ${new Date()}`);
+        statistics.push(`${count}) ${fullName} - ${new Date()}`);
 
         await delay(1000, 1000);
       } catch (e) {
@@ -121,14 +125,16 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
 
     async function runInvites() {
       window.scrollTo(0, document.body.scrollHeight);
+      await delay(2000, 2000);
       const list = $('.search-entity');
-      window.scrollTo(0, 0);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      await delay(2000, 2000);
 
       for (let i = 0; i < list.length; i++) {
         try {
           await sendMessage(list[i]);
           if (Number(message.max) > 0 && count >= parseInt(message.max)) {
-            download(statistics.toString(), `statistics-${new Date().getTime()}`, 'txt');
+            download(statistics.toString().replace(/,/g, '\n'), `statistics-${new Date().getTime()}`, 'txt');
             return Promise.reject('complete');
           }
         } catch (e) {
