@@ -17,6 +17,7 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
 
     let count = 0;
     const statistics = [];
+    const header = document.querySelector('header#extended-nav');
 
     function delay(max, min) {
       const time = randomInteger(min, max);
@@ -36,7 +37,7 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
     async function handleClickAddNote() {
       await delay(1000, 1000);
 
-      const addNotBtn = $('.send-invite__actions').find('.artdeco-button--secondary.mr1');
+      const addNotBtn = $('.artdeco-modal__actionbar').find('.artdeco-button--secondary.mr1');
       // const closeBtn = $('.send-invite__header').find('.send-invite__cancel-btn');
 
       // if (addNotBtn.text().trim().toLowerCase() !== 'add a note') {
@@ -75,7 +76,7 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
     async function sendMessage(item) {
       item.scrollIntoView({ behavior: 'smooth' });
       await delay(500, 500);
-      window.scrollBy({ top: -52, behavior: 'smooth' });
+      // window.scrollBy({ top: -52, behavior: 'smooth' });
 
       const profile = extractProfile(item);
       const btn = $(item).find('.search-result__actions--primary');
@@ -96,7 +97,7 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
         // if LinkedIn asking for type in user's email - return
         await delay(1000, 2000);
         if (document.querySelector('input#email')) {
-          $('.send-invite__cancel-btn').click();
+          $('.artdeco-modal__dismiss').click();
           return;
         }
 
@@ -104,8 +105,8 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
         const textField = $('.send-invite__custom-message');
 
         await fillField(textField, message.inviteMessage, profile);
-        const sendBtn = $('.send-invite__actions').find('.artdeco-button--3.ml1');
-        // const sendBtn = $('.send-invite__cancel-btn');
+        // const sendBtn = $('.artdeco-modal__actionbar').find('.artdeco-button--3.ml1');
+        const sendBtn = $('.artdeco-modal__dismiss');
 
         await delay(3000, 6000);
         $(sendBtn).click();
@@ -124,6 +125,7 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
     }
 
     async function runInvites() {
+      header.style.display = 'none';
       window.scrollTo(0, document.body.scrollHeight);
       await delay(2000, 2000);
       const list = $('.search-entity');
@@ -135,6 +137,7 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
           await sendMessage(list[i]);
           if (Number(message.max) > 0 && count >= parseInt(message.max)) {
             download(statistics.toString().replace(/,/g, '\n'), `statistics-${new Date().getTime()}`, 'txt');
+            header.style.display = 'block';
             return Promise.reject('complete');
           }
         } catch (e) {
