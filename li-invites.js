@@ -105,8 +105,8 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
         const textField = $('.send-invite__custom-message');
 
         await fillField(textField, message.inviteMessage, profile);
-        // const sendBtn = $('.artdeco-modal__actionbar').find('.artdeco-button--3.ml1');
-        const sendBtn = $('.artdeco-modal__dismiss');
+        const sendBtn = $('.artdeco-modal__actionbar').find('.artdeco-button--3.ml1');
+        // const sendBtn = $('.artdeco-modal__dismiss');
 
         await delay(3000, 6000);
         $(sendBtn).click();
